@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+    
+        .perfil {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }
+    
+        h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+    
+        img {
+            border-radius: 50%;
+            border: 2px solid #3498db;
+            margin-bottom: 15px;
+        }
+    
+        p {
+            color: #555;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+    
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #3498db;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+    
+        a:hover {
+            background-color: #2980b9;
+        }
+        /* Contenedor de las estrellas */
+        .estrellas-promedio {
+            display: flex;
+            justify-content: center;  /* Centrar estrellas */
+            font-size: 24px;
+            padding: 10px;
+            background-color: #f3f3f3; /* Fondo claro */
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Estrellas llenas */
+        .estrella.llena {
+            color: #ffd700; /* Color dorado */
+        }
+        
+        /* Estrellas vacías */
+        .estrella {
+            color: #e0e0e0; /* Color gris */
+            width: 24px; /* Asegúrate de que todas tengan el mismo ancho */
+            height: 24px; /* Asegúrate de que todas tengan el mismo alto */
+        }
+        
+        /* Estrella media */
+        .estrella.media::before {
+            content: '\2605'; /* Estrella llena */
+            position: relative;
+            z-index: 1;
+        }
+
+    </style>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="perfil">
+        <h2>{{ usuario.nombre }}</h2>
+        
+        <form method="post" enctype="multipart/form-data">
+            
+            {% if usuario.foto.startswith('http') %}
+                <!-- Mostrar la imagen subida a Cloudinary si es una URL -->
+                <img src="{{ usuario.foto }}" alt="foto de {{ usuario.nombre }}" width="100px"><br>
+            {% else %}
+                <!-- Mostrar la imagen predeterminada si no es una URL (local) -->
+                <img src="{{ url_for('static', filename='uploads/perfil.jpg') }}" alt="foto predeterminada" width="100px"><br>
+            {% endif %}
+            
+            <p>Correo: {{ usuario.correo }}</p>
+            <p>Teléfono: {{ usuario.telefono }}</p>
+            <p>calificacion:<p>
+                <!-- Contenedor de las estrellas del promedio -->
+                <div class="estrellas-promedio">
+                    {% for i in range(1, 6) %}
+                        <span class="estrella {% if i <= usuario.calificacion_promedio %}llena{% elif i - usuario.calificacion_promedio < 1 %}media{% endif %}">
+                            &#9733;
+                        </span>
+                    {% endfor %}
+                </div>
+                
+            <p>Tiempo en la plataforma: {{ (datetime.utcnow() - usuario.fecha_registro).days }} días</p>
+
+            <a href="{{ url_for('editar_perfil', user_id=usuario.id) }}">Editar perfil</a>
+            <br>
+            <a href="{{ url_for('base') }}">Volver</a>
+        </form>
+    </div>
+</body>
+</html>
